@@ -23,6 +23,9 @@ function _bootstrap_library_defaults() {
     'minimized' => array(
       'options' => 1,
     ),
+    'files' => array(
+      'types' => array('css', 'js'),
+    ),
   );
 }
 
@@ -63,6 +66,22 @@ function bootstrap_library_update_7002() {
     $settings['minimized'] = array(
       'options' => 0,
     );
+    $update = TRUE;
+  }
+  if ($update) variable_set('bootstrap_library_settings', $settings);
+}
+
+/**
+ * Adds file types settings.
+ */
+function bootstrap_library_update_7003() {
+  $theme = variable_get('theme_default', NULL);
+  $settings = variable_get('bootstrap_library_settings');
+  $update = FALSE;
+
+  // Set file types if not set.
+  if (!isset($settings['files']['types'])) {
+    $settings['files']['types'] = array('css', 'js');
     $update = TRUE;
   }
   if ($update) variable_set('bootstrap_library_settings', $settings);

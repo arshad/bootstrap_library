@@ -63,7 +63,16 @@ function bootstrap_library_requirements($phase) {
 function bootstrap_library_init() {
   $settings = variable_get('bootstrap_library_settings');
   if (bootstrap_library_check_path($settings['visibility']['visibility'], $settings['visibility']['pages']) && bootstrap_library_check_theme()) {
-    libraries_load('bootstrap');
+    $types = array_filter($settings['files']['types']);
+    // Load default if both types are selected.
+    if (isset($types['css']) && isset($types['js'])) {
+      libraries_load('bootstrap');
+    }
+    else {
+      // Load the variant.
+      $type = key($types);
+      libraries_load('bootstrap', $type);
+    }
   }
 }
 
@@ -184,6 +193,23 @@ function bootstrap_library_settings($form, &$form_state) {
     '#description' => t("Specify in which themes you wish the library to load."),
   );
 
+  // Files settings.
+  $options['files'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Files Settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $options['files']['types'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Select which files to load from the library'),
+    '#options' => array(
+      'css' => t('CSS files'),
+      'js' => t('Javascript files'),
+    ),
+    '#default_value' => $settings['files']['types'],
+  );
+
   $options['#tree'] = TRUE;
   $form['bootstrap_library_settings'] = $options;
 
@@ -214,6 +240,23 @@ function bootstrap_library_libraries_info() {
       'css' => array(
         'css/bootstrap' . $min . '.css',
         'css/bootstrap-theme' . $min . '.css',
+      ),
+    ),
+    'variants' => array(
+      'css' => array(
+        'files' => array(
+          'css' => array(
+            'css/bootstrap' . $min . '.css',
+            'css/bootstrap-theme' . $min . '.css',
+          ),
+        ),
+      ),
+      'js' => array(
+        'files' => array(
+          'js' => array(
+            'js/bootstrap' . $min . '.js',
+          ),
+        ),
       ),
     ),
   );
